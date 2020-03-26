@@ -28,7 +28,7 @@ export default function usePropsObservable<Props extends object>(
     subj: null as any, // limit constructer calls
     last: null,
     invalidatedCount: 0,
-    insideRender: false
+    insideRender: false,
   });
   if (ref.current.subj === null) ref.current.subj = new BehaviorSubject(props);
 
@@ -43,7 +43,7 @@ export default function usePropsObservable<Props extends object>(
   if (!ref.current.subs) {
     ref.current.subs = render(
       ref.current.subj.pipe(distinctUntilChanged(compare))
-    ).subscribe(next => {
+    ).subscribe((next) => {
       ref.current.last = next;
       if (!ref.current.insideRender) {
         ref.current.invalidatedCount += 1;

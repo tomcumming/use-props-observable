@@ -10,7 +10,7 @@ npm i use-props-observable
 
 ## Example
 
-```javascript
+```typescript
 import { map, startWith, scan, switchAll } from "rxjs/operators";
 import { interval, BehaviorSubject } from "rxjs";
 

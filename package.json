@@ -1,21 +1,28 @@
 {
   "name": "use-props-observable",
-  "version": "0.0.1",
+  "description": "A react hook for writing components in terms of an observable of props",
+  "version": "1.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tomcumming/use-props-observable.git"
+  },
+  "homepage": "https://github.com/tomcumming/use-props-observable",
+  "license": "MIT",
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write README.md package.json tsconfig.json \"src/**/*\""
   },
   "devDependencies": {
-    "@types/react": "^16.9.23",
-    "prettier": "^1.19.1",
-    "typescript": "^3.8.2"
+    "@types/react": "^16.9",
+    "prettier": "2",
+    "typescript": "^3.8"
   },
   "peerDependencies": {
-    "react": "^16.13.0",
-    "rxjs": "^6.5.4"
+    "react": "^16.13",
+    "rxjs": "^6.5"
   },
   "dependencies": {
-    "rxjs": "^6.5.4"
+    "rxjs": "^6.5"
   }
 }
