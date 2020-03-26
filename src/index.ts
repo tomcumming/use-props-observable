@@ -44,7 +44,6 @@ export default function usePropsObservable<Props extends object>(
     React.useEffect(() => () => ref.current.subs?.unsubscribe(), []);
 
     ref.current.insideRender = true;
-    console.log('render start');
 
     if(!ref.current.subs) {
         ref.current.subs = render(ref.current.subj.pipe(distinctUntilChanged(compare))).subscribe(next => {
@@ -52,9 +51,6 @@ export default function usePropsObservable<Props extends object>(
             if(!ref.current.insideRender) {
                 ref.current.invalidatedCount += 1;
                 setInvalidatedCount(ref.current.invalidatedCount);
-                console.log('setting state');
-            } else {
-                console.log('skipping state');
             }
         });
     } else {
@@ -62,9 +58,6 @@ export default function usePropsObservable<Props extends object>(
     }
 
     ref.current.insideRender = false;
-    console.log('render end');
-
-    console.log('render', props, _invalidatedCount);
 
     return ref.current.last;
 }
