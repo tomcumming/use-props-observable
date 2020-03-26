@@ -4,7 +4,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write package.json tsconfig.json \"src/**/*\""
+    "format": "prettier --write README.md package.json tsconfig.json \"src/**/*\""
   },
   "devDependencies": {
     "@types/react": "^16.9.23",
