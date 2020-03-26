@@ -1,13 +1,11 @@
 {
-    "compilerOptions": {
-        "strict": true,
-        "target": "ESNext",
-        "module": "ESNext",
-        "moduleResolution": "Node",
-        "outDir": "lib",
-        "declaration": true
-    },
-    "files": [
-        "src/index.ts"
-    ]
+  "compilerOptions": {
+    "strict": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "outDir": "lib",
+    "declaration": true
+  },
+  "files": ["src/index.ts"]
 }
