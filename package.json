@@ -1,5 +1,5 @@
 {
-    "name": "reactivecomponent",
+    "name": "use-props-observable",
     "version": "0.0.1",
     "main": "lib/index.js",
     "scripts": {
