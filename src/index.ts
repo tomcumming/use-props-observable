@@ -2,6 +2,8 @@ import * as React from "react";
 import { Observable, Subscription, BehaviorSubject } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 
+const unsetValue = Symbol();
+
 function shallowCompare<T extends object>(a: T, b: T): boolean {
   for (const k in a)
     if (!b.hasOwnProperty(k) || !Object.is(a[k], b[k])) return false;
@@ -12,7 +14,7 @@ function shallowCompare<T extends object>(a: T, b: T): boolean {
 type State<Props, Output> = {
   subj: BehaviorSubject<Props>;
   subs?: Subscription;
-  last: Output;
+  last: typeof unsetValue | Output;
   invalidatedCount: number;
   insideRender: boolean;
 };
@@ -21,14 +23,16 @@ export default function usePropsObservable<Props extends object, Output>(
   props: Props,
   render: (props$: Observable<Props>) => Observable<Output>,
   compare: (a: Props, b: Props) => boolean = shallowCompare
-): null | Output {
-  const ref = React.useRef<State<Props, null | Output>>({
-    subj: null as any, // limit constructer calls
-    last: null,
-    invalidatedCount: 0,
-    insideRender: false,
-  });
-  if (ref.current.subj === null) ref.current.subj = new BehaviorSubject(props);
+): Output {
+  const ref = React.useRef<State<Props, Output>>(null as any);
+  // limit constructer calls
+  if (ref.current === null)
+    ref.current = {
+      subj: new BehaviorSubject(props),
+      last: unsetValue,
+      invalidatedCount: 0,
+      insideRender: false,
+    };
 
   const [_invalidatedCount, setInvalidatedCount] = React.useState(
     ref.current.invalidatedCount
@@ -53,6 +57,9 @@ export default function usePropsObservable<Props extends object, Output>(
   }
 
   ref.current.insideRender = false;
+
+  if (ref.current.last === unsetValue)
+    throw new Error(`A value must be emitted immediately`);
 
   return ref.current.last;
 }

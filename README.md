@@ -2,22 +2,13 @@
 
 A react hook for [rxjs](https://github.com/ReactiveX/RxJS) `Observable`s.
 
-## Usage
-
-```bash
-npm i use-props-observable
-```
-
 ## Example
 
 ```typescript
-import { map, startWith, scan, pairwise } from "rxjs/operators";
-import { interval, combineLatest } from "rxjs";
-
 import usePropsObservable from "use-props-observable";
 
-function Time(props: {}) {
-  const timeMsg = usePropsObservable(props, () =>
+function Time() {
+  const timeMsg = usePropsObservable({}, () =>
     interval(1000).pipe(
       startWith(0),
       map(() => new Date()),
@@ -56,6 +47,27 @@ function MessageBox(props: { message: string }) {
   });
 }
 ```
+
+## Usage
+
+```bash
+npm i use-props-observable
+```
+
+The hook is exported as the module's default export:
+
+```typescript
+export default function usePropsObservable<Props extends object, Output>(
+  props: Props,
+  render: (props$: Observable<Props>) => Observable<Output>,
+  compare?: (a: Props, b: Props) => boolean
+): Output;
+```
+
+Some trade-offs were made for a more pleasant API:
+
+- Only the first instance of the render function will be used for the lifetime of the component, passing in a different one in another render will do nothing.
+- The `Observable` returned by the render function must emit at least one value immediately.
 
 ## Why not just `.subscribe` in a `useEffect` and set state?
 
