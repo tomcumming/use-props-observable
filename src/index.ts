@@ -2,8 +2,6 @@ import * as React from "react";
 import { Observable, Subscription, BehaviorSubject } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 
-export type Rendered = null | React.ReactElement;
-
 function shallowCompare<T extends object>(a: T, b: T): boolean {
   for (const k in a)
     if (!b.hasOwnProperty(k) || !Object.is(a[k], b[k])) return false;
@@ -11,20 +9,20 @@ function shallowCompare<T extends object>(a: T, b: T): boolean {
   return true;
 }
 
-type State<Props> = {
+type State<Props, Output> = {
   subj: BehaviorSubject<Props>;
   subs?: Subscription;
-  last: Rendered;
+  last: Output;
   invalidatedCount: number;
   insideRender: boolean;
 };
 
-export default function usePropsObservable<Props extends object>(
+export default function usePropsObservable<Props extends object, Output>(
   props: Props,
-  render: (props$: Observable<Props>) => Observable<Rendered>,
+  render: (props$: Observable<Props>) => Observable<Output>,
   compare: (a: Props, b: Props) => boolean = shallowCompare
-): Rendered {
-  const ref = React.useRef<State<Props>>({
+): null | Output {
+  const ref = React.useRef<State<Props, null | Output>>({
     subj: null as any, // limit constructer calls
     last: null,
     invalidatedCount: 0,

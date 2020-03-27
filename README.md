@@ -1,6 +1,6 @@
 # use-props-observable
 
-A react hook for writing components in terms of [rxjs](https://github.com/ReactiveX/RxJS) `Observable<Props>`.
+A react hook for [rxjs](https://github.com/ReactiveX/RxJS) `Observable`s.
 
 ## Usage
 
@@ -11,50 +11,49 @@ npm i use-props-observable
 ## Example
 
 ```typescript
-import { map, startWith, scan, switchAll } from "rxjs/operators";
-import { interval, BehaviorSubject } from "rxjs";
+import { map, startWith, scan, pairwise } from "rxjs/operators";
+import { interval, combineLatest } from "rxjs";
 
 import usePropsObservable from "use-props-observable";
 
 function Time(props: {}) {
-  return usePropsObservable(props, () =>
+  const timeMsg = usePropsObservable(props, () =>
     interval(1000).pipe(
       startWith(0),
       map(() => new Date()),
-      map((d) => <h1>The time is {d.toLocaleTimeString()}</h1>)
+      map((d) => `The time is ${d.toLocaleTimeString()}`)
     )
   );
+
+  return <p>{timeMsg}</p>;
 }
 
-function Counter(props: { startAt: number }) {
-  return usePropsObservable(props, (props$) =>
-    props$.pipe(
-      map(({ startAt }) => {
-        const delta$ = new BehaviorSubject<number>(0);
+function MessageBox(props: { message: string }) {
+  return usePropsObservable(props, (props$) => {
+    const count$ = props$.pipe(scan((p, _c) => p + 1, -1));
+    const lastFew$ = props$.pipe(
+      pairwise(),
+      map(([first]) => first),
+      scan((p, { message }) => [message].concat(p).slice(0, 3), [] as string[]),
+      startWith([] as string[])
+    );
 
-        return delta$.pipe(
-          scan((p, c) => p + c, startAt),
-          map((count) => (
-            <p>
-              Current count: <strong>{count}</strong>
-              <button onClick={() => delta$.next(-1)}>-</button>
-              <button onClick={() => delta$.next(1)}>+</button>
-            </p>
-          ))
-        );
-      }),
-      switchAll()
-    )
-  );
-}
-
-function Examples() {
-  return (
-    <section>
-      <Time />
-      <Counter startAt={3} />
-    </section>
-  );
+    return combineLatest(props$, count$, lastFew$).pipe(
+      map(([{ message }, count, lastFew]) => (
+        <>
+          <h1>{message}</h1>
+          <p>
+            My message has changed <strong>{count}</strong> times
+          </p>
+          <ul>
+            {lastFew.map((m, idx) => (
+              <li key={idx}>{m}</li>
+            ))}
+          </ul>
+        </>
+      ))
+    );
+  });
 }
 ```
 

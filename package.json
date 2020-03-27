@@ -1,7 +1,7 @@
 {
   "name": "use-props-observable",
-  "description": "A react hook for writing components in terms of an observable of props",
-  "version": "1.0.1",
+  "description": "A react hook for rxjs observables",
+  "version": "1.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/tomcumming/use-props-observable.git"
