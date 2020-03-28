@@ -60,14 +60,13 @@ The hook is exported as the module's default export:
 export default function usePropsObservable<Props extends object, Output>(
   props: Props,
   render: (props$: Observable<Props>) => Observable<Output>,
+  deps?: unknown[],
   compare?: (a: Props, b: Props) => boolean
 ): Output;
 ```
 
-Some trade-offs were made for a more pleasant API:
-
-- Only the first instance of the render function will be used for the lifetime of the component, passing in a different one in another render will do nothing.
 - The `Observable` returned by the render function must emit at least one value immediately.
+- The inner observable will only unsubscribe and resubscribe to the most recent function when any of the `deps` change.
 
 ## Why not just `.subscribe` in a `useEffect` and set state?
 

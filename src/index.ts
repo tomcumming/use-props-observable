@@ -14,6 +14,7 @@ function shallowCompare<T extends object>(a: T, b: T): boolean {
 type State<Props, Output> = {
   subj: BehaviorSubject<Props>;
   subs?: Subscription;
+  deps?: unknown[];
   last: typeof unsetValue | Output;
   invalidatedCount: number;
   insideRender: boolean;
@@ -22,17 +23,15 @@ type State<Props, Output> = {
 export default function usePropsObservable<Props extends object, Output>(
   props: Props,
   render: (props$: Observable<Props>) => Observable<Output>,
+  deps: unknown[] = [],
   compare: (a: Props, b: Props) => boolean = shallowCompare
 ): Output {
-  const ref = React.useRef<State<Props, Output>>(null as any);
-  // limit constructer calls
-  if (ref.current === null)
-    ref.current = {
-      subj: new BehaviorSubject(props),
-      last: unsetValue,
-      invalidatedCount: 0,
-      insideRender: false,
-    };
+  const ref = React.useRef<State<Props, Output>>({
+    subj: null as any,
+    last: unsetValue,
+    invalidatedCount: 0,
+    insideRender: false,
+  });
 
   const [_invalidatedCount, setInvalidatedCount] = React.useState(
     ref.current.invalidatedCount
@@ -42,7 +41,14 @@ export default function usePropsObservable<Props extends object, Output>(
 
   ref.current.insideRender = true;
 
-  if (!ref.current.subs) {
+  if (
+    ref.current.deps === undefined ||
+    !shallowCompare(ref.current.deps, deps)
+  ) {
+    ref.current.subs?.unsubscribe();
+    ref.current.subj = new BehaviorSubject(props);
+    ref.current.last = unsetValue;
+    ref.current.deps = deps;
     ref.current.subs = render(
       ref.current.subj.pipe(distinctUntilChanged(compare))
     ).subscribe((next) => {
